@@ -68,3 +68,16 @@ func Query(query string) (r *Result) {
 	defer rows.Close()
 	return &res
 }
+
+//查询的样例
+/*
+func example() {
+	model.Connect()
+	var ans *model.Result
+	ans = model.Query("SELECT * FROM  list where id < 10")
+	for k, v := range ans.Fields {
+		fmt.Println("idx is : ", k)
+		fmt.Println("idx is : ", v.Symbol, "time is ", v.Symbol, v.Id)
+	}
+}
+*/
