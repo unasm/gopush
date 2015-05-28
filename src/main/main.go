@@ -27,7 +27,6 @@ type hub struct {
 	broadcast  chan string
 	register   chan *client
 	unregister chan *client
-	content    string
 }
 
 type client struct {
@@ -40,14 +39,17 @@ var h = hub{
 	register:   make(chan *client),
 	unregister: make(chan *client),
 	clients:    make(map[*client]bool),
-	content:    "",
 }
 
-func (h *hub) broadcastMessage() {
+func (h *hub) broadcastMessage(content []byte) {
+	fmt.Println(content)
 	for c := range h.clients {
 		select {
-		case c.send <- []byte(h.content):
+		//如果这里for循环的话，是线性的，如果通过信道的话，是并行的
+		case c.send <- content:
+			fmt.Println(content)
 			break
+		//case
 		default:
 			close(c.send)
 			delete(h.clients, c)
@@ -58,11 +60,11 @@ func (h *hub) broadcastMessage() {
 //扮演了信息中心的角色
 func (h *hub) run() {
 	for {
+		//监控hub的几个信道变化
 		select {
 		case c := <-h.register:
 			//新添加的节点
 			h.clients[c] = true
-			c.send <- []byte(h.content)
 			break
 		case c := <-h.unregister:
 			//连接中断的连接
@@ -73,8 +75,7 @@ func (h *hub) run() {
 			}
 			break
 		case m := <-h.broadcast:
-			h.content = m
-			h.broadcastMessage()
+			h.broadcastMessage([]byte(m))
 			break
 		}
 	}
@@ -89,6 +90,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 //第一种websocket的方式
 func serverWs(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r.Cookies())
+	fmt.Println("above is cookie")
 	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
@@ -121,6 +124,7 @@ func serverWs(w http.ResponseWriter, r *http.Request) {
 func (c *client) readPump() {
 	defer func() {
 		//窗口关闭或者连接关闭的时候，会触发这个defer
+		//fmt.Println("close the connection")
 		h.unregister <- c
 		c.ws.Close()
 	}()
@@ -134,6 +138,7 @@ func (c *client) readPump() {
 		return nil
 	})
 	for {
+		fmt.Println(r.Cookies())
 		//守护着这个连接，从连接中读取信息，然后通过信道传递给broadcast ，进入传递的队列
 		_, msg, err := c.ws.ReadMessage()
 		if err != nil {
@@ -150,8 +155,8 @@ func (c *client) writePump() {
 		ticker.Stop()
 		c.ws.Close()
 	}()
-
 	for {
+		//监控send的信号变化,并维持通信畅通
 		select {
 		case msg, ok := <-c.send:
 			if !ok {
@@ -177,6 +182,10 @@ func (c *client) write(mt int, msg []byte) error {
 
 //第一种websocket的方式
 func Socket(w http.ResponseWriter, r *http.Request) {
+	//fmt.Println(http.Cookie())
+	fmt.Println(r.Cookies())
+	fmt.Println("above is cookie")
+	//fmt.Println(r.Cookie())
 	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
