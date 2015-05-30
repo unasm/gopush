@@ -3,7 +3,9 @@
 	<body>
 		<script type="text/javascript">
 			var sock = null;
-			var wsuri = "ws://127.0.0.1:8070/chat/";
+			var aid = parseInt(Math.random() * 100);
+			var wsuri = "ws://127.0.0.1:8070/chat/12/23?aid=" + aid + "&&uid=unasm";
+			//var wsuri = "ws://127.0.0.1:8070/chat/12/23?aid=12&&uid=unasm";
 
 			window.onload = function() {
 
@@ -11,7 +13,8 @@
 
 				sock = new WebSocket(wsuri);
 
-				sock.onopen = function() {
+				sock.onopen = function(res) {
+					console.log(res);
 					console.log("connected to " + wsuri);
 				}
 
@@ -22,12 +25,21 @@
 				sock.onmessage = function(e) {
 					console.log("message received: " + e.data);
 				}
+				sock.onerror = function(error) {
+					console.log(error)
+				}
 			};
 
-function send() {
-	var msg = document.getElementById('message').value;
-	sock.send(msg);
-};
+			function send() {
+				var msg = document.getElementById('message').value;
+				console.log(msg);
+				sock.send(msg);
+			};
+			function send2() {
+				console.log("closing" );
+				sock.close();
+			};
+		
 </script>
 <h1>WebSocket Echo Test</h1>
 <form>
@@ -35,6 +47,7 @@ function send() {
 	Message: <input id="message" type="text" value="Hello, world!">
 	</p>
 </form>
+<button onclick="send2();">shut down</button>
 <button onclick="send();">Send Message</button>
 </body>
 </html>
