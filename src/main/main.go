@@ -6,7 +6,9 @@ import (
 	"log"
 	"model"
 	"net/http"
+	_ "net/http/pprof"
 	"runtime"
+	//	"runtime/pprof"
 	"strconv"
 	"time"
 )
@@ -159,10 +161,18 @@ func (c *client) readPump() {
 	}()
 
 }
+
+func Home(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	Println("yes ,welcome !")
+	Fprintf(w, "Hello,world323<br/>")
+}
+
 func main() {
 	runtime.GOMAXPROCS(4)
 	go model.Runstate()
-	http.HandleFunc("/", Index)
+	http.HandleFunc("/chat/", Index)
+	http.HandleFunc("/", Home)
 	go h.run()
 	if err := http.ListenAndServe(":8010", nil); err != nil {
 		log.Fatal("Listen and add serve error ", err)
