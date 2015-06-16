@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 //不死小强
+=======
+>>>>>>> 2e06b5628f2fdb626c4efbe3e01e9823951a6591
 package main
 
 import (
@@ -18,7 +21,11 @@ func main() {
 	//l := log.New(file, "", os.O_APPEND)
 
 	for {
+<<<<<<< HEAD
 		cmd := exec.Command("/home/jiamin1/websocket")
+=======
+		cmd := exec.Command("/Users/tianyi/main")
+>>>>>>> 2e06b5628f2fdb626c4efbe3e01e9823951a6591
 		err := cmd.Start()
 		if err != nil {
 			Printf("%s 启动命令失败", time.Now(), err)

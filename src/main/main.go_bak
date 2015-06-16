@@ -1,0 +1,52 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"time"
+)
+
+func mul_route() {
+	c1 := make(chan int)
+	c2 := make(chan int)
+
+	go func() {
+		for {
+			time.Sleep(time.Second * 2)
+			c1 <- 2
+		}
+	}()
+	go func() {
+		for {
+			time.Sleep(time.Second * 3)
+			c2 <- 1
+		}
+	}()
+
+	for {
+		select {
+		case msg1 := <-c1:
+			fmt.Println("got1 : ", msg1)
+		case msg1 := <-c2:
+			fmt.Println("got2 : ", msg1)
+		case <-time.After(time.Second * 1):
+			fmt.Println("Time out")
+		}
+	}
+}
+
+func index(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	fmt.Println(r.Form)
+	fmt.Println(r.RemoteAddr)
+	fmt.Fprintf(w, "hello,world\n")
+}
+func main() {
+	//mul_route()
+	http.HandleFunc("/", index)
+	if err := http.ListenAndServe(":8010", nil); err != nil {
+		log.Fatal("Listen and Server : ", err)
+	}
+
+}
