@@ -10,11 +10,8 @@ import (
 	_ "net/http/pprof"
 	"runtime"
 	//	"runtime/pprof"
-<<<<<<< HEAD
 	"github.com/gorilla/websocket"
 	//"reflect"
-=======
->>>>>>> 2e06b5628f2fdb626c4efbe3e01e9823951a6591
 	"strconv"
 	//"time"
 )
@@ -105,30 +102,12 @@ func main() {
 			model.CheckRecover()
 		}
 	}()
-<<<<<<< HEAD
 	//go model.Copy()
 	http.HandleFunc("/chat/", Index)
 	http.HandleFunc("/inspect/", Home)
 	//http.HandleFunc("/chat/", Home)
 	go model.Run()
 	//go h.run()
-=======
-
-}
-
-func Home(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	Println("yes ,welcome !")
-	Fprintf(w, "Hello,world323<br/>")
-}
-
-func main() {
-	runtime.GOMAXPROCS(4)
-	go model.Runstate()
-	http.HandleFunc("/chat/", Index)
-	http.HandleFunc("/", Home)
-	go h.run()
->>>>>>> 2e06b5628f2fdb626c4efbe3e01e9823951a6591
 	if err := http.ListenAndServe(":8010", nil); err != nil {
 		log.Fatal("Listen and add serve error ", err)
 	}

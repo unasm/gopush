@@ -22,17 +22,11 @@ const (
 )
 
 func Inspect() {
-<<<<<<< HEAD
 	for {
 		Runstate()
 		CpuState()
 		time.Sleep(time.Second * 100)
 	}
-=======
-	Runstate()
-	CpuState()
-	time.Sleep(time.Second * 100)
->>>>>>> 2e06b5628f2fdb626c4efbe3e01e9823951a6591
 }
 
 //查看内存的使用情况
@@ -49,14 +43,6 @@ func Runstate() {
 	Println("CPU的数量为 : ", runtime.NumCPU())
 }
 
-<<<<<<< HEAD
-=======
-//如果发生了一场，导致goroutine意外退出
-func CheckRecover() {
-	Println("goroutine 意外退出")
-}
-
->>>>>>> 2e06b5628f2fdb626c4efbe3e01e9823951a6591
 //cpu的使用情况
 func CpuState() {
 	cmd := exec.Command("ps", "aux")
