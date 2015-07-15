@@ -1,0 +1,20 @@
+堆内存为 :  819 MB
+闲置的堆内存 :  270 MB
+内存总量 :  2885  MB
+使用中的内存 :  270  MB
+内存分配次数 :  735
+内存释放次数 :  164
+分配的系统栈容量 :  229 MB
+
+目前开启的goroutine数量为 :  6
+CPU的数量为 :  8
+now cpu cost is 18.10
+shuting down
+shuting down
+shuting down
+shuting down
+shuting down
+unasm  is editing  37
+unasm  is editing  8
+shuting down
+shuting down

@@ -58,12 +58,7 @@ func parseOutLine(out *bytes.Buffer) ([]string, bool) {
 func SysCall(cmdStr string, argc string) [][]string {
 	var out bytes.Buffer
 	res := make([][]string, 0, 100)
-	//tmp := "ps ax | awk '{ print $1 }' | grep -e '^888888$'"
-	//tmp := "ps ax | awk \"{ print $1 }\" | grep -e '^11501$'"
-	//cmd := exec.Command("ps", "aux")
 	cmd := exec.Command(cmdStr, argc)
-	//cmd := exec.Command(cmdStr, argc)
-	//cmd := exec.Command("ps ax | awk '{ print $1 }' | grep -e '^" + "888888" + "$'")
 	cmd.Stdout = &out
 	err := cmd.Run()
 	if err != nil {
@@ -75,10 +70,6 @@ func SysCall(cmdStr string, argc string) [][]string {
 		return res
 	}
 	res = append(res, tmp)
-	/*
-		Println(cap(tmp))
-		Println(len(tmp))
-	*/
 	for {
 		tmp, flag = parseOutLine(&out)
 		if flag == false {
@@ -109,7 +100,7 @@ func main() {
 		if flag == 1 {
 			os.Exit(1)
 		}
-	} else {
+	} else if len(num) > 0 {
 		if err != nil {
 			Println("one wrong")
 		}

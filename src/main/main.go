@@ -1,3 +1,4 @@
+//应该分不同的项目，数组各不相同,refer不同，访问不同,不然管理机和前端机访问的url会造成冲突
 package main
 
 import (
@@ -6,6 +7,8 @@ import (
 	"html/template"
 	"log"
 	"model"
+	"model/wb"
+	//"model/href"
 	"net/http"
 	_ "net/http/pprof"
 	"runtime"
@@ -56,36 +59,32 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	}
 	r.ParseForm()
 	model.Form = r.Form
-	if model.IsExistOne("jid") == false {
-		Println("No jid")
+	if model.IsExistOne("pid") == false {
+		Println("No pid")
 		return
 	}
-	if model.Isint("jid", r.Form["jid"][0]) == false {
+	if model.Isint("pid", r.Form["pid"][0]) == false {
 		Println("aid is not int")
 		return
 	}
-	aid, err := strconv.Atoi(r.Form["jid"][0])
+	pid, err := strconv.Atoi(r.Form["pid"][0])
 	model.CheckErr(err, "转换失败")
-	if model.IsExistOne("editor") == false {
-		Println("editor is NULL")
-		return
-	}
-	uid := r.Form["editor"][0]
-	ok, str := model.CheckRepeat(aid, uid)
-	if ok == false {
-		conn.WriteMessage(websocket.TextMessage, []byte(str))
-		conn.Close()
-		return
-	}
+
 	//Println(reflect.TypeOf(conn))
-	model.StartNew(aid, uid, conn)
+
+	wb.Send("one more")
+	wb.StartNew(pid, "", conn)
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	//t, err := template.ParseFiles("/home/jiamin1/test.html")
+	Println(config.VIEW + "inspect.html")
+
 	t, err := template.ParseFiles(config.VIEW + "inspect.html")
+	//href.GetHost(r.URL)
 	model.CheckErr(err, "解析模板失败")
-	str := model.Report()
+	str := wb.Report()
+	//str := "hello,world"
 	type Data struct {
 		Str template.HTML
 	}
@@ -94,9 +93,9 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-
-	//model.Connect()
-	go model.Inspect()
+	//cc := config.Host{}
+	config.Init()
+	wb.Init()
 	defer func() {
 		if r := recover(); r != nil {
 			model.CheckRecover()
@@ -106,8 +105,9 @@ func main() {
 	http.HandleFunc("/chat/", Index)
 	http.HandleFunc("/inspect/", Home)
 	//http.HandleFunc("/chat/", Home)
-	go model.Run()
+	//go model.Run()
 	//go h.run()
+	//wb.StartListenBroad()
 	if err := http.ListenAndServe(":8010", nil); err != nil {
 		log.Fatal("Listen and add serve error ", err)
 	}
