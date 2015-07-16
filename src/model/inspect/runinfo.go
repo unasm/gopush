@@ -17,6 +17,11 @@ import (
 var m runtime.MemStats
 var stack []runtime.StackRecord
 
+type Net struct {
+	Header []string
+	Data   map[string][]int64
+}
+
 const (
 	ShowCpuDetail = false
 )
@@ -107,62 +112,103 @@ func CpuState() {
 */
 func NetState() {
 	net := GetNetWork()
-	for k, v := range net {
+	Header := net.Header
+	for k, v := range net.Data {
 		Printf("device : %s\n", k)
-		Printf("\t 每秒接收数据包: \t%d\n", v[0])
-		Printf("\t 每秒接受:\t%d kb\n", v[1]/1024)
-		Printf("\t 每秒发送数据包: \t%d\n", v[2])
-		Printf("\t 每秒发送\t %d kB\n", v[3]/1024)
-
+		if len(Header) != len(v) {
+			Printf("error \n")
+		} else {
+			for i, end := 0, len(Header); i < end; i++ {
+				Printf("\t %s is : \t%d\n", Header[i], v[i])
+			}
+		}
 	}
+	Println(net)
 }
 
 /*
  *  IFACE 是设备名，
  */
-func GetNetWork() map[string][]int64 {
-	var buf []int64
+func GetNetWork() Net {
+	//func GetNetWork() map[string][]int64 {
+	var Header []string
+	//var Data map[string][]int64
+	Data := make(map[string][]int64)
+	//Header := m
 	cmd := exec.Command("sar", "-n", "DEV", "1", "1")
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	if err := cmd.Run(); err != nil {
 		log.Fatal(err)
 	}
-	res := make(map[string][]int64)
-	var index int
-	for i := 0; true; i = 1 {
+	var index, headIdx int
+	var cnt int64
+	headIdx = 0
+	buf := make([]int64, 100)
+	strBuf := make([]string, 100)
+	for i := 0; true; i++ {
+		//while(true) {
 		line, err := out.ReadString('\n')
-		if i == 0 {
-			continue
-		}
 		if err != nil {
+			//结束了，跳出
 			break
 		}
+		line = strings.TrimSpace(line)
+		if line == "" {
+			i--
+			continue
+		}
 		tokens := strings.Split(line, " ")
-		var cnt int64
-		cnt = 0
-		buf = make([]int64, len(line))
-		index = 0
-		for j := 0; j < len(tokens); j++ {
-			tokens[j] = strings.TrimSpace(tokens[j])
-			if tokens[j] != "" {
-				tmp, err := strconv.ParseInt(tokens[j], 10, 64)
-				if err == nil {
-					buf[index] = tmp
-					cnt += tmp
-					index++
+		if i == 0 {
+			//获取命令的header头
+			for j := 1; j < len(tokens); j++ {
+				tokens[j] = strings.TrimSpace(tokens[j])
+				if len(tokens[j]) > 0 {
+					if headIdx > 0 {
+						strBuf[headIdx-1] = tokens[j]
+					}
+					headIdx++
 				}
 			}
-		}
-		if index == 4 && cnt > 0 && tokens[0] == "Average:" {
-			res[tokens[1]] = make([]int64, index)
-			for k := 0; k < index; k++ {
-				res[tokens[1]][k] = buf[k]
+			Header = make([]string, headIdx-1)
+			for j := 0; j < headIdx-1; j++ {
+				Header[j] = strBuf[j]
+			}
+		} else {
+			//cnt := 0
+			index = 0
+			cnt = 0
+			for j := 0; j < len(tokens); j++ {
+				tokens[j] = strings.TrimSpace(tokens[j])
+				if tokens[j] != "" {
+					tmp, err := strconv.ParseInt(tokens[j], 10, 64)
+					if err == nil {
+						buf[index] = tmp
+						cnt += tmp
+						index++
+					}
+				}
+			}
+			if index > 0 && cnt > 0 && tokens[0] == "Average:" {
+				Data[tokens[1]] = make([]int64, index)
+				for k := 0; k < index; k++ {
+					Data[tokens[1]][k] = buf[k]
+				}
 			}
 		}
 	}
 	/*
-		for k, line := range res {
+		var ans Net
+		ans.Data = Data
+		ans.Header = Header
+		return ans
+	*/
+	return Net{
+		Data:   Data,
+		Header: Header,
+	}
+	/*
+		for k, line := range Data {
 			Printf("%s\n", k)
 			for key, v := range line {
 				Printf("%d, %d\t", key, v)
@@ -170,7 +216,7 @@ func GetNetWork() map[string][]int64 {
 			Printf("\n")
 		}
 	*/
-	return res
+	//return res
 }
 
 /*
