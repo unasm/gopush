@@ -1,4 +1,4 @@
-package model
+package inspect
 
 import (
 	"bytes"
@@ -25,11 +25,12 @@ func Inspect() {
 	for {
 		Runstate()
 		CpuState()
+		NetState()
 		time.Sleep(time.Second * 100)
 	}
 }
 
-//查看内存的使用情况
+//从golang内部 查看内存的使用情况
 func Runstate() {
 	runtime.ReadMemStats(&m)
 	Println("堆内存为 : ", m.HeapSys/1000, "MB")
@@ -92,6 +93,84 @@ func CpuState() {
 		}
 	}
 	Printf("now cpu cost is %.2f\n", cpuCnt)
+}
+
+/*
+	显示网络的状态
+	 Ipkts/s   The number of packets received per second.
+
+	Ibytes/s  The number of bytes received per second.
+
+	Opkts/s   The number of packets sent per second.
+
+	Obytes/s  The number of bytes sent per second.
+*/
+func NetState() {
+	net := GetNetWork()
+	for k, v := range net {
+		Printf("device : %s\n", k)
+		Printf("\t 每秒接收数据包: \t%d\n", v[0])
+		Printf("\t 每秒接受:\t%d kb\n", v[1]/1024)
+		Printf("\t 每秒发送数据包: \t%d\n", v[2])
+		Printf("\t 每秒发送\t %d kB\n", v[3]/1024)
+
+	}
+}
+
+/*
+ *  IFACE 是设备名，
+ */
+func GetNetWork() map[string][]int64 {
+	var buf []int64
+	cmd := exec.Command("sar", "-n", "DEV", "1", "1")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	if err := cmd.Run(); err != nil {
+		log.Fatal(err)
+	}
+	res := make(map[string][]int64)
+	var index int
+	for i := 0; true; i = 1 {
+		line, err := out.ReadString('\n')
+		if i == 0 {
+			continue
+		}
+		if err != nil {
+			break
+		}
+		tokens := strings.Split(line, " ")
+		var cnt int64
+		cnt = 0
+		buf = make([]int64, len(line))
+		index = 0
+		for j := 0; j < len(tokens); j++ {
+			tokens[j] = strings.TrimSpace(tokens[j])
+			if tokens[j] != "" {
+				tmp, err := strconv.ParseInt(tokens[j], 10, 64)
+				if err == nil {
+					buf[index] = tmp
+					cnt += tmp
+					index++
+				}
+			}
+		}
+		if index == 4 && cnt > 0 && tokens[0] == "Average:" {
+			res[tokens[1]] = make([]int64, index)
+			for k := 0; k < index; k++ {
+				res[tokens[1]][k] = buf[k]
+			}
+		}
+	}
+	/*
+		for k, line := range res {
+			Printf("%s\n", k)
+			for key, v := range line {
+				Printf("%d, %d\t", key, v)
+			}
+			Printf("\n")
+		}
+	*/
+	return res
 }
 
 /*
