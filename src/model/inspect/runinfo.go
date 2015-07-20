@@ -27,13 +27,15 @@ const (
 )
 
 func Inspect() {
-	for {
-		Runstate()
-		CpuState()
-		NetState()
-		Printf("\n##############################################################\n")
-		time.Sleep(time.Second * 100)
-	}
+	go func() {
+		for {
+			Runstate()
+			CpuState()
+			NetState()
+			Printf("\n##############################################################\n")
+			time.Sleep(time.Second * 10)
+		}
+	}()
 }
 
 //从golang内部 查看内存的使用情况
@@ -124,7 +126,6 @@ func NetState() {
 			}
 		}
 	}
-	Println(net)
 }
 
 /*
@@ -136,7 +137,7 @@ func GetNetWork() Net {
 	//var Data map[string][]int64
 	Data := make(map[string][]int64)
 	//Header := m
-	cmd := exec.Command("sar", "-n", "DEV", "1", "1")
+	cmd := exec.Command("sar", "-n", "DEV", "1", "4")
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	if err := cmd.Run(); err != nil {
@@ -191,9 +192,9 @@ func GetNetWork() Net {
 				}
 			}
 			if index > 0 && cnt > 0 && tokens[0] == "Average:" {
-				Data[tokens[1]] = make([]int64, index)
+				Data[tokens[3]] = make([]int64, index)
 				for k := 0; k < index; k++ {
-					Data[tokens[1]][k] = buf[k]
+					Data[tokens[3]][k] = buf[k]
 				}
 			}
 		}

@@ -121,17 +121,13 @@ func ListenHub() {
 		select {
 		case Client := <-h.register:
 
-			//Println("adding : ", Client.art_id)
 			h.Clients[Client] = true
+			Println("total connection is  : ", len(h.Clients))
 			break
 		case Client := <-h.unregister:
-			Println("before delete ", len(h.Clients), " : ", h.Clients[Client])
+			//Println("before delete ", len(h.Clients), " : ", h.Clients[Client])
 			delete(h.Clients, Client)
-			Println("after delete ", len(h.Clients), " : ", h.Clients[Client])
-			/*
-				if h.Clients[Client] {
-				}
-			*/
+			//Println("after delete ", len(h.Clients), " : ", h.Clients[Client])
 			break
 		}
 	}

@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"log"
 	"model"
+	"model/inspect"
 	"model/wb"
 	//"model/href"
 	"net/http"
@@ -14,7 +15,6 @@ import (
 	"runtime"
 	//	"runtime/pprof"
 	"github.com/gorilla/websocket"
-	//"reflect"
 	"strconv"
 	//"time"
 )
@@ -51,15 +51,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			return true
 		},
 	}
-	conn, err := upgrader.Upgrade(w, r, nil)
-	model.CheckErr(err, "升级失败")
-	if err != nil {
-		Fprintf(w, "upgrader faied")
-		return
-	}
 	r.ParseForm()
 	model.Form = r.Form
-	if model.IsExistOne("pid") == false {
+	if len(r.Form["pid"]) == 0 {
 		Println("No pid")
 		return
 	}
@@ -67,17 +61,23 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		Println("aid is not int")
 		return
 	}
+
 	pid, err := strconv.Atoi(r.Form["pid"][0])
 	model.CheckErr(err, "转换失败")
 
+	conn, err := upgrader.Upgrade(w, r, nil)
+	model.CheckErr(err, "升级失败")
+	if err != nil {
+		Fprintf(w, "upgrader faied")
+		return
+	}
 	wb.Send("one more")
 	wb.StartNew(pid, "", conn)
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	//t, err := template.ParseFiles("/home/jiamin1/test.html")
-	Println(config.VIEW + "inspect.html")
-
+	//Println(config.VIEW + "inspect.html")
 	t, err := template.ParseFiles(config.VIEW + "inspect.html")
 	//href.GetHost(r.URL)
 	model.CheckErr(err, "解析模板失败")
@@ -103,6 +103,7 @@ func main() {
 	//go model.Copy()
 	http.HandleFunc("/chat/", Index)
 	http.HandleFunc("/inspect/", Home)
+	//Println("step")
 	//http.HandleFunc("/chat/", Home)
 	//go model.Run()
 	//go h.run()
