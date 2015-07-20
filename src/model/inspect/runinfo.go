@@ -31,6 +31,7 @@ func Inspect() {
 		Runstate()
 		CpuState()
 		NetState()
+		Printf("\n##############################################################\n")
 		time.Sleep(time.Second * 100)
 	}
 }

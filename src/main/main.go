@@ -70,8 +70,6 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	pid, err := strconv.Atoi(r.Form["pid"][0])
 	model.CheckErr(err, "转换失败")
 
-	//Println(reflect.TypeOf(conn))
-
 	wb.Send("one more")
 	wb.StartNew(pid, "", conn)
 }
@@ -96,6 +94,7 @@ func main() {
 	//cc := config.Host{}
 	config.Init()
 	wb.Init()
+	inspect.Inspect()
 	defer func() {
 		if r := recover(); r != nil {
 			model.CheckRecover()
