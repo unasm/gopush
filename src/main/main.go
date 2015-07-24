@@ -33,7 +33,8 @@ func renderTemplate(w http.ResponseWriter, tmpl string, view *Page) {
 */
 func Index(w http.ResponseWriter, r *http.Request) {
 
-	if r.Proto != "HTTP/1.1" {
+	//Println(r.Header["Sec-Websocket-Version"][0])
+	if r.Proto != "HTTP/1.1" || r.Header["Sec-Websocket-Version"][0] != "13" {
 		Fprintf(w, "request proto is not permit")
 		return
 	}

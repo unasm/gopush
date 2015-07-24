@@ -26,6 +26,8 @@ func CheckErr(err error, note string) {
 		data["type"] = "exception"
 		data["note"] = note
 		data["err"] = err.Error()
+		Println(data)
+		Printf("\n")
 		//ErrorInsert(data)
 		panic(err)
 	}
