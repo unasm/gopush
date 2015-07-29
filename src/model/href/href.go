@@ -1,10 +1,5 @@
-package href
+package model
 
-import (
-	. "fmt"
-)
-
-func GetHost(url string) {
-	Println(url)
-	//return "string"
+func GetHost(url string) string {
+		
 }

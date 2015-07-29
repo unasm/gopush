@@ -27,8 +27,11 @@ func CheckErr(err error, note string) {
 		data["note"] = note
 		data["err"] = err.Error()
 		Println(data)
+		Println(err)
 		Printf("\n")
+		//runtime.Goexit()
 		//ErrorInsert(data)
 		panic(err)
+		//os.Goexit
 	}
 }
