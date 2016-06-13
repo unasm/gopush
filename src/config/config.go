@@ -9,15 +9,11 @@ import (
 )
 
 const (
-	DB_NAME     string = "jiamin1"
-	DB_HOST     string = "i.mysqldev.mix.sina.com.cn"
+	DB_NAME     string = "qiye"
+	DB_HOST     string = "100.73.17.75"
 	DB_PORT     string = "3306"
-	DB_PASSWORD string = "root007"
-	DB_USER     string = "root"
-	//ROOT        string = "/home/jiamin1/go/src/"
-	//VIEW        string = "/home/jiamin1/go/src/view/"
-
-	//URL [2]string = {"baiu.com", "sina.cn"}
+	DB_PASSWORD string = "VMF9>4z@426Y"
+	DB_USER     string = "devmysql"
 )
 
 var ROOT string
@@ -25,15 +21,8 @@ var VIEW string
 
 type Host struct {
 	Url map[string]int
-	//Url interface{}
 }
 
-//var Host Host
-
-/*
-
-//Host.
-*/
 func Init() Host {
 	var res Host
 	//func (Host *Host) Init() {

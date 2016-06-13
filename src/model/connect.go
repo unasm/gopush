@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"fmt"
 	. "fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"strings"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 	//"reflect"
 )
 
@@ -35,8 +36,8 @@ func Connect() {
 	//
 	db, err = sql.Open("mysql", config.DB_USER+":"+config.DB_PASSWORD+"@tcp("+config.DB_HOST+":"+config.DB_PORT+")/"+config.DB_NAME)
 	//强行连接，判断是不是连接成功
-	CheckErr(err, "open数据库失败")
-	CheckErr(db.Ping(), "ping数据库失败")
+	//CheckErr(err, "open数据库失败")
+	//CheckErr(db.Ping(), "ping数据库失败")
 }
 
 //查询数据库

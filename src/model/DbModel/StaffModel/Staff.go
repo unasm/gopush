@@ -223,12 +223,19 @@ func (table *Model) Insert(data map[string]string) int64 {
 	keys = strings.Trim(keys, ",")
 	values = strings.Trim(values, ",")
 	sql := "INSERT INTO " + table.TabName + " (" + keys + ") VALUES (" + values + ")"
+	fmt.Println(sql)
 	res, err := table.db.Exec(sql)
 	//model.CheckErr(err, "插入数据库失败")
-	if err == nil {
+	if err != nil {
+		fmt.Println(err)
 		return -1
 	}
-	id, err := res.LastInsertId()
+	id, _ := res.LastInsertId()
+	/*
+		if err != nil {
+			panic("get last insert id failed")
+		}
+	*/
 	//model.CheckErr(err, "获取插入id失败")
 	return id
 }
